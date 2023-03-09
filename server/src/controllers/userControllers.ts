@@ -16,7 +16,6 @@ export const signup: RequestHandler<
   SignUpBody,
   unknown
 > = async (req, res, next) => {
-  console.log(req.body);
   const username = req.body.username;
   const email = req.body.email;
   const passwordRaw = req.body.password;
@@ -61,6 +60,43 @@ export const signup: RequestHandler<
     });
 
     res.status(201).json(newUser);
+  } catch (error) {
+    next(error);
+  }
+};
+
+interface LoginBody {
+  email?: string;
+  password?: string;
+}
+
+export const login: RequestHandler<
+  unknown,
+  unknown,
+  LoginBody,
+  unknown
+> = async (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  try {
+    if (!email || !password) {
+      throw createHttpError(400, "Parameters missing");
+    }
+
+    const user = await UserModal.findOne({ email: email }).select("+password");
+
+    if (!user) {
+      throw createHttpError(401, "Invalid credentials");
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      throw createHttpError(401, "Invalid credentials");
+    }
+
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }
