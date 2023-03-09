@@ -26,12 +26,12 @@ const createSendToken = (
     ),
     httpOnly: true,
     secure: false,
-    domain: "",
+    // domain: "",
   };
 
   if (env.NODE_ENV === "production") {
     cookieOptions.secure = true;
-    cookieOptions.domain = "https://trello-clone-three-alpha.vercel.app";
+    // cookieOptions.domain = "https://trello-clone-three-alpha.vercel.app";
   }
   console.log("jwt", token, cookieOptions);
   res.cookie("jwt", token, cookieOptions);

@@ -29,11 +29,11 @@ const createSendToken = (user, id, statusCode, res) => {
         expires: new Date(Date.now() + +validateEnv_1.default.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
         httpOnly: true,
         secure: false,
-        domain: "",
+        // domain: "",
     };
     if (validateEnv_1.default.NODE_ENV === "production") {
         cookieOptions.secure = true;
-        cookieOptions.domain = "https://trello-clone-three-alpha.vercel.app";
+        // cookieOptions.domain = "https://trello-clone-three-alpha.vercel.app";
     }
     console.log("jwt", token, cookieOptions);
     res.cookie("jwt", token, cookieOptions);
