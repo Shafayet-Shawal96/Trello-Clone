@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-const hostUrl = "http://localhost:5000";
+// const hostUrl = "http://localhost:5000";
+const hostUrl = "https://trello-clone-server-snowy.vercel.app";
 
 function App() {
   const [data, setData] = useState("no data");

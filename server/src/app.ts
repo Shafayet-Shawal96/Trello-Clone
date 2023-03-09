@@ -12,7 +12,8 @@ const app = express();
 
 let originString = "http://localhost:3000";
 
-if (env.NODE_ENV === "production") originString = "";
+if (env.NODE_ENV === "production")
+  originString = "https://trello-clone-three-alpha.vercel.app/";
 
 app.use(cors({ origin: originString, credentials: true }));
 
@@ -23,13 +24,16 @@ app.use(cookieParser());
 
 app.use("/helloworld", (req, res) => {
   console.log(`cokkie ${req.cookies.jwt}`);
-  res.status(200).json({ msg: "Hello World " });
+  let message = "Hello World ";
+  if (req.cookies.jwt) message = "Cookie found";
+  res.status(200).json({ msg: message });
 });
 
 app.use("/api/v1/users", userRoutes);
 
-app.use((req, res, next) => {
-  next(createHttpError(404, "Endpoint not found"));
+app.use((req, res) => {
+  res.status(404).json({ msg: "Endpoint not found" });
+  // next(createHttpError(404, "Endpoint not found"));
 });
 
 app.use((error: unknown, req: Request, res: Response) => {
