@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 
+const hostUrl = "http://localhost:5000";
+
 function App() {
   const [data, setData] = useState("no data");
   async function fetchData() {
-    const response = await fetch("http://localhost:5000/helloworld");
+    const response = await fetch(`${hostUrl}/helloworld`, {
+      credentials: "include",
+    });
     const data = await response.json();
     setData(data.msg);
   }
   async function sendData() {
-    const response = await fetch("http://localhost:5000/api/v1/users/login", {
+    const response = await fetch(`${hostUrl}/api/v1/users/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
