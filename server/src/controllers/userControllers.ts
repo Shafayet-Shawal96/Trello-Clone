@@ -26,9 +26,14 @@ const createSendToken = (
     ),
     httpOnly: true,
     secure: false,
+    domain: "",
   };
 
-  if (env.NODE_ENV === "production") cookieOptions.secure = true;
+  if (env.NODE_ENV === "production") {
+    cookieOptions.secure = true;
+    cookieOptions.domain = ".vercel.app";
+  }
+  console.log("jwt", token, cookieOptions);
   res.cookie("jwt", token, cookieOptions);
 
   res.status(statusCode).json({
