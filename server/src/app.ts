@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express, { Request, Response } from "express";
+import env from "./utils/validateEnv";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -9,7 +10,11 @@ import userRoutes from "./routes/userRoutes";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+let originString = "http://localhost:3000";
+
+if (env.NODE_ENV === "production") originString = "";
+
+app.use(cors({ origin: originString, credentials: true }));
 
 app.use(morgan("dev"));
 
