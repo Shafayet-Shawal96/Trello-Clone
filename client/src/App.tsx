@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-// const hostUrl = "http://localhost:5000";
-const hostUrl = "https://trello-clone-server-snowy.vercel.app";
+let hostUrl = "http://localhost:5000";
+if (process.env.NODE_ENV === "production") {
+  hostUrl = "https://trello-clone-server-snowy.vercel.app";
+}
 
 function App() {
+  console.log(process.env.NODE_ENV);
   const [data, setData] = useState("no data");
   async function fetchData() {
     const response = await fetch(`${hostUrl}/helloworld`, {

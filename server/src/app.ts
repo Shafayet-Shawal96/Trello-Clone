@@ -4,7 +4,7 @@ import env from "./utils/validateEnv";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import createHttpError, { isHttpError } from "http-errors";
+import { isHttpError } from "http-errors";
 
 import userRoutes from "./routes/userRoutes";
 

@@ -27,11 +27,12 @@ const createSendToken = (
     ),
     httpOnly: true,
     secure: false,
-    sameSite: "none",
+    sameSite: "lax",
   };
 
   if (env.NODE_ENV === "production") {
     cookieOptions.secure = true;
+    cookieOptions.sameSite = "none";
   }
 
   res.cookie("jwt", token, cookieOptions);
