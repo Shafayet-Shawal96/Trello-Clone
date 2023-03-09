@@ -1,4 +1,5 @@
 import { RequestHandler, Response } from "express";
+import { CookieOptions } from "express";
 import createHttpError from "http-errors";
 import UserModal, { User } from "../models/userModal";
 import env from "../utils/validateEnv";
@@ -20,20 +21,19 @@ const createSendToken = (
 ) => {
   const token = signToken(id);
 
-  const cookieOptions = {
+  const cookieOptions: CookieOptions = {
     expires: new Date(
       Date.now() + +env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
     secure: false,
-    // domain: "",
+    sameSite: "none",
   };
 
   if (env.NODE_ENV === "production") {
     cookieOptions.secure = true;
-    // cookieOptions.domain = "https://trello-clone-three-alpha.vercel.app";
   }
-  console.log("jwt", token, cookieOptions);
+
   res.cookie("jwt", token, cookieOptions);
 
   res.status(statusCode).json({
