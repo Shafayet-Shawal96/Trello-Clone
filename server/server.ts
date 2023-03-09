@@ -1,22 +1,15 @@
-import "dotenv/config";
-import express from "express";
-import morgan from "morgan";
-import cors from "cors";
+import app from "./src/app";
+import env from "./src/utils/validateEnv";
+import mongoose from "mongoose";
 
-const app = express();
+const port = env.PORT;
 
-app.use(cors());
-
-app.use(morgan("dev"));
-
-app.use(express.json());
-
-app.use((req, res) => {
-  res.status(200).json({ msg: "Hello World " });
-});
-
-app.listen(5000, () => {
-  console.log("Server running on port: " + 5000);
-});
-
-export default app;
+mongoose
+  .connect(env.MONGO_CONNECTION_STRING)
+  .then(() => {
+    console.log("Mongoose connected");
+    app.listen(port, () => {
+      console.log("Server running on port: " + port);
+    });
+  })
+  .catch(console.error);
