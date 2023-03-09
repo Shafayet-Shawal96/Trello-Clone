@@ -14,7 +14,7 @@ const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 const app = (0, express_1.default)();
 let originString = "http://localhost:3000";
 if (validateEnv_1.default.NODE_ENV === "production")
-    originString = "https://trello-clone-three-alpha.vercel.app/";
+    originString = "https://trello-clone-three-alpha.vercel.app";
 app.use((0, cors_1.default)({ origin: originString, credentials: true }));
 app.use((0, morgan_1.default)("dev"));
 app.use(express_1.default.json());

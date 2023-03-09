@@ -13,7 +13,7 @@ const app = express();
 let originString = "http://localhost:3000";
 
 if (env.NODE_ENV === "production")
-  originString = "https://trello-clone-three-alpha.vercel.app/";
+  originString = "https://trello-clone-three-alpha.vercel.app";
 
 app.use(cors({ origin: originString, credentials: true }));
 
