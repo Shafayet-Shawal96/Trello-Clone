@@ -1,7 +1,45 @@
-import { RequestHandler } from "express";
+import { RequestHandler, Response } from "express";
 import createHttpError from "http-errors";
-import UserModal from "../models/userModal";
+import UserModal, { User } from "../models/userModal";
+import env from "../utils/validateEnv";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+
+const signToken = (id: mongoose.Types.ObjectId) => {
+  return jwt.sign({ id }, env.JWT_SECRET, {
+    expiresIn: env.JWT_EXPIRES_IN,
+  });
+};
+
+const createSendToken = (
+  user: User,
+  id: mongoose.Types.ObjectId,
+  statusCode: number,
+  res: Response
+) => {
+  const token = signToken(id);
+
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + +env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: false,
+  };
+
+  if (env.NODE_ENV === "production") cookieOptions.secure = true;
+  res.cookie("jwt", token, cookieOptions);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    cookieOptions: cookieOptions,
+    data: {
+      user: user,
+    },
+  });
+};
 
 interface SignUpBody {
   username?: string;
@@ -59,7 +97,7 @@ export const signup: RequestHandler<
       password: passwordHashed,
     });
 
-    res.status(201).json(newUser);
+    createSendToken(newUser, newUser._id, 201, res);
   } catch (error) {
     next(error);
   }
@@ -84,7 +122,9 @@ export const login: RequestHandler<
       throw createHttpError(400, "Parameters missing");
     }
 
-    const user = await UserModal.findOne({ email: email }).select("+password");
+    const user = await UserModal.findOne({ email: email }).select(
+      "+password +email"
+    );
 
     if (!user) {
       throw createHttpError(401, "Invalid credentials");
@@ -95,8 +135,7 @@ export const login: RequestHandler<
     if (!passwordMatch) {
       throw createHttpError(401, "Invalid credentials");
     }
-
-    res.status(200).json(user);
+    createSendToken(user, user._id, 200, res);
   } catch (error) {
     next(error);
   }

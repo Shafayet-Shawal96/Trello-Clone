@@ -6,5 +6,6 @@ export default cleanEnv(process.env, {
   PORT: port(),
   JWT_SECRET: str(),
   JWT_EXPIRES_IN: str(),
+  JWT_COOKIE_EXPIRES_IN: str(),
   NODE_ENV: str(),
 });

@@ -2,19 +2,22 @@ import "dotenv/config";
 import express, { Request, Response } from "express";
 import morgan from "morgan";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import createHttpError, { isHttpError } from "http-errors";
 
 import userRoutes from "./routes/userRoutes";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 app.use(morgan("dev"));
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/helloworld", (req, res) => {
+  console.log(`cokkie ${req.cookies.jwt}`);
   res.status(200).json({ msg: "Hello World " });
 });
 
