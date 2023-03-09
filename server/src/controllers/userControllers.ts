@@ -31,7 +31,7 @@ const createSendToken = (
 
   if (env.NODE_ENV === "production") {
     cookieOptions.secure = true;
-    cookieOptions.domain = ".vercel.app";
+    cookieOptions.domain = "https://trello-clone-three-alpha.vercel.app";
   }
   console.log("jwt", token, cookieOptions);
   res.cookie("jwt", token, cookieOptions);
