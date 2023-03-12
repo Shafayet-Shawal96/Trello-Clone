@@ -20,6 +20,8 @@ async function fetchUser(input: RequestInfo, init?: RequestInit) {
       throw new ConflictError(
         "Already have a user with this email address. You can log in instead"
       );
+    } else if (response.status === 404) {
+      throw Error("Not Authenticated: ");
     } else {
       throw Error(
         "Request failed with status: " +
@@ -43,5 +45,28 @@ export async function login(credentials: LoginCredentials): Promise<User> {
     },
     body: JSON.stringify(credentials),
   });
+  return response.json();
+}
+
+export interface SignupCredentials {
+  username: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
+}
+
+export async function signup(credentials: SignupCredentials): Promise<User> {
+  const response = await fetchUser("/api/v1/users/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  });
+  return response.json();
+}
+
+export async function getLoggedInUser(): Promise<User> {
+  const response = await fetchUser("/api/v1/users/loggedinuser");
   return response.json();
 }

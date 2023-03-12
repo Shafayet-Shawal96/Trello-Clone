@@ -1,10 +1,11 @@
 import { RequestHandler, Response } from "express";
 import { CookieOptions } from "express";
+import { promisify } from "util";
 import createHttpError from "http-errors";
-import UserModal, { User } from "../models/userModal";
+import UserModel, { User } from "../models/userModel";
 import env from "../utils/validateEnv";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 
 const signToken = (id: mongoose.Types.ObjectId) => {
@@ -37,14 +38,7 @@ const createSendToken = (
 
   res.cookie("jwt", token, cookieOptions);
 
-  res.status(statusCode).json({
-    status: "success",
-    token,
-    cookieOptions: cookieOptions,
-    data: {
-      user: user,
-    },
-  });
+  res.status(statusCode).json(user);
 };
 
 interface SignUpBody {
@@ -70,7 +64,7 @@ export const signup: RequestHandler<
       throw createHttpError(400, "Parameters missing");
     }
 
-    const existingUsername = await UserModal.findOne({ username: username });
+    const existingUsername = await UserModel.findOne({ username: username });
 
     if (existingUsername) {
       throw createHttpError(
@@ -79,7 +73,7 @@ export const signup: RequestHandler<
       );
     }
 
-    const existingEmail = await UserModal.findOne({ email: email });
+    const existingEmail = await UserModel.findOne({ email: email });
 
     if (existingEmail) {
       throw createHttpError(
@@ -97,7 +91,7 @@ export const signup: RequestHandler<
 
     const passwordHashed = await bcrypt.hash(passwordRaw, 10);
 
-    const newUser = await UserModal.create({
+    const newUser = await UserModel.create({
       username: username,
       email: email,
       password: passwordHashed,
@@ -128,7 +122,7 @@ export const login: RequestHandler<
       throw createHttpError(400, "Parameters missing");
     }
 
-    const user = await UserModal.findOne({ email: email }).select(
+    const user = await UserModel.findOne({ email: email }).select(
       "+password +email"
     );
 
@@ -144,5 +138,22 @@ export const login: RequestHandler<
     createSendToken(user, user._id, 200, res);
   } catch (error) {
     next(error);
+  }
+};
+
+// Only for rendered pages, no errors!
+export const isLoggedIn: RequestHandler = async (req, res) => {
+  if (req.cookies.jwt) {
+    try {
+      // 1) verify token
+      const decoded = jwt.verify(req.cookies.jwt, env.JWT_SECRET) as JwtPayload;
+
+      const user = await UserModel.findById(decoded.id).select("+email");
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(200).json(error);
+    }
+  } else {
+    res.status(404).json({ msg: "No User" });
   }
 };
